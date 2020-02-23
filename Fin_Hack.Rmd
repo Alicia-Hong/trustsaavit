@@ -1,0 +1,70 @@
+---
+title: "Fin_Hack"
+author: "Jingning Hong (Alicia)"
+date: "2/22/2020"
+output: html_document
+---
+
+```{r knn}
+setwd("C:/Users/hjingnin/Desktop")
+library(reticulate)
+library(mlbench)
+library(caret)
+source_python("model_evaluation_utils.py")
+
+#importing the dataset
+#importing the dataset
+x <- read.csv("X_train_small.csv", header = TRUE)
+y <- read.csv("y_train_small.csv", header = FALSE)
+test <- read.csv("X_test_small.csv", header = TRUE)
+train <- cbind(x,y)
+train_na <- na.omit(train)
+test_na <- na.omit(test)
+train_na <- sapply(train_na, as.numeric)
+test_na <- sapply(test_na, as.numeric)
+
+sample <- train_na[sample(1:nrow(train_na), 5000),]
+sample_test <- train_na[sample(1:nrow(train_na), 1200),]
+
+pre_processed <- preProcess(train_na, method = c("scale", "center"))
+
+str(sample)
+str(sample_test)
+
+#Pre-process data
+#pre_process <- preProcess(train, method = c("scale", "center"))
+#y <- discretize(y, method = "frequency", order = F)
+
+#KNN
+#Train and Test Baseline KNN Model
+model_knn <- train(V1 ~ ., data = sample, method = "knn")
+predict_knn <- predict(model_knn, newdata = sample_test)
+print(model_knn)
+print(predict_knn)
+
+#Pre-process data
+train1 <- predict(pre_processed, newdata = sample)
+test1 <- predict(pre_processed, newdata = sample_test)
+
+#Building a new model using standardized dataset
+model_knn1 <- train(V1 ~ ., data = train1, method = "knn")
+predict_knn1 <- predict(model_knn1, newdata = test1)
+print(model_knn1)
+print(predict_knn1)
+
+#write.csv(sample_test, "sample.csv")
+#write.csv(predict_knn, "knn.csv")
+```
+
+```{r confusion matrix}
+x1 <- read.csv("sample.csv", header = TRUE)
+x1$V1 <- as.factor(x1$V1)
+y1 <- read.csv("knn.csv", header = TRUE)
+y1 <- as.factor(y1[,2])
+
+summary(y1)
+summary(x1$V1)
+
+#This is to get the accuracy output
+confusionMatrix(y1, x1$V1, positive = "pos")
+```
