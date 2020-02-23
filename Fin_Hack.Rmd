@@ -38,7 +38,7 @@ str(sample_test)
 #KNN
 #Train and Test Baseline KNN Model
 model_knn <- train(V1 ~ ., data = sample, method = "knn")
-predict_knn <- predict(model_knn, newdata = sample_test)
+predict_knn <- predict(model_knn, newdata = sample_test, classes=c('0', '1', '2'))
 print(model_knn)
 print(predict_knn)
 
@@ -48,12 +48,12 @@ test1 <- predict(pre_processed, newdata = sample_test)
 
 #Building a new model using standardized dataset
 model_knn1 <- train(V1 ~ ., data = train1, method = "knn")
-predict_knn1 <- predict(model_knn1, newdata = test1)
+predict_knn1 <- predict(model_knn1, newdata = test1, classes=c('0', '1', '2'))
 print(model_knn1)
 print(predict_knn1)
 
-#write.csv(sample_test, "sample.csv")
-#write.csv(predict_knn, "knn.csv")
+write.csv(sample_test, "sample.csv")
+write.csv(predict_knn, "knn.csv")
 ```
 
 ```{r confusion matrix}
